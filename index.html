@@ -1,10 +1,163 @@
+<!DOCTYPE html>
+<html lang="vi">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Kế hoạch & Điểm hòa vốn Gian hàng Hội chợ</title>
+  <title>Kế hoạch &amp; Điểm hòa vốn Gian hàng Hội chợ</title>
   <link rel="stylesheet" href="gian-hang-hoi-cho.css" />
 </head>
 <body>
-  <!-- Nội dung giao diện giữ nguyên như cấu trúc trước -->
+  <div class="container">
+    <header class="topbar">
+      <div>
+        <h1>Gian hàng Đồ uống &amp; Bánh đóng gói — Bảng Kinh tế</h1>
+        <p>Theo dõi sản phẩm, đơn bán thử, điểm hòa vốn và kịch bản lượng khách hội chợ</p>
+      </div>
+      <div class="actions">
+        <span id="dataSourceBadge" class="badge badge-btc">Đang dùng dữ liệu mẫu BTC</span>
+        <button type="button" class="btn-secondary" id="btnLoadSample">Nạp dữ liệu mẫu</button>
+      </div>
+    </header>
+
+    <!-- Giả định đang áp dụng -->
+    <section class="section">
+      <div class="section-head">
+        <h2>Giả định đang áp dụng</h2>
+        <p class="hint">Tự động cập nhật khi bạn sửa sản phẩm, chi phí cố định hoặc kịch bản</p>
+      </div>
+      <div id="activeAssumptions" class="assumptions-list"></div>
+    </section>
+
+    <!-- Chỉ số tổng quan -->
+    <section class="section">
+      <div class="section-head">
+        <h2>Tổng quan kế hoạch &amp; Điểm hòa vốn</h2>
+        <p class="hint">Đơn vị tiền tệ: <strong>đ</strong> · Đơn vị sản lượng: <strong>phần</strong></p>
+      </div>
+      <div class="kpi-grid" id="kpiGrid"></div>
+    </section>
+
+    <!-- Sản phẩm & Chi phí cố định -->
+    <div class="grid-2">
+      <section class="section" style="margin-top:0;">
+        <div class="section-head">
+          <h2>Sản phẩm &amp; Giả định phần bán</h2>
+          <button type="button" class="btn-secondary" id="btnAddProduct">+ Thêm món</button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Sản phẩm</th>
+                <th>Giá bán (đ/phần)</th>
+                <th>Biến phí (đ/phần)</th>
+                <th>Dự kiến (phần)</th>
+                <th>Đã thử (phần)</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="productTableBody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="section" style="margin-top:0;">
+        <div class="section-head">
+          <h2>Khoản chi cố định</h2>
+          <button type="button" class="btn-secondary" id="btnAddFixed">+ Thêm khoản chi</button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Khoản chi cố định</th>
+                <th>Số tiền (đ)</th>
+                <th>Ghi chú</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="fixedTableBody"></tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+
+    <!-- Ghi nhận đơn bán thử -->
+    <div class="grid-2">
+      <section class="section" style="margin-top:0;">
+        <div class="section-head">
+          <h2>Ghi nhận đơn bán thử</h2>
+          <p class="hint">Cập nhật ngay số phần đã bán và doanh thu thử</p>
+        </div>
+        <form id="trialForm">
+          <div style="display:grid; grid-template-columns: 1fr 140px; gap:10px;">
+            <div>
+              <label for="trialProduct" style="display:block; font-size:0.85rem; font-weight:600; margin-bottom:4px;">Chọn sản phẩm</label>
+              <select id="trialProduct"></select>
+            </div>
+            <div>
+              <label for="trialQty" style="display:block; font-size:0.85rem; font-weight:600; margin-bottom:4px;">Số lượng (phần)</label>
+              <input type="number" id="trialQty" class="num" min="1" step="1" value="1" />
+            </div>
+          </div>
+
+          <div class="preview-box" id="trialPreview">
+            Thành tiền tạm tính: <strong>0 đ</strong>
+          </div>
+
+          <div style="margin-top:10px;">
+            <button type="submit" class="btn-primary">Lưu đơn bán thử</button>
+          </div>
+          <div id="trialFeedback" class="feedback" role="status"></div>
+        </form>
+      </section>
+
+      <section class="section" style="margin-top:0;">
+        <div class="section-head">
+          <h2>Lịch sử đơn bán thử</h2>
+          <span id="trialSummary" class="hint">0 đơn · 0 đ</span>
+        </div>
+        <div class="table-wrap">
+          <table style="min-width: 420px;">
+            <thead>
+              <tr>
+                <th>Sản phẩm</th>
+                <th>Số lượng</th>
+                <th>Thành tiền (đ)</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="trialLogBody"></tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+
+    <!-- So sánh kịch bản -->
+    <section class="section">
+      <div class="section-head">
+        <h2>So sánh kịch bản lượng khách (phân bổ theo tỷ trọng phần dự kiến)</h2>
+        <p class="hint">Khách mua = Lượt khách × Tỷ lệ mua · Phân bổ làm tròn tới phần nguyên</p>
+      </div>
+
+      <div class="table-wrap" style="margin-bottom:14px;">
+        <table style="min-width: 660px;">
+          <thead>
+            <tr>
+              <th>Kịch bản</th>
+              <th>Lượt khách dự kiến</th>
+              <th>Tỷ lệ mua (%)</th>
+              <th>Ghi chú</th>
+            </tr>
+          </thead>
+          <tbody id="scenarioInputBody"></tbody>
+        </table>
+      </div>
+
+      <div class="scenario-cards" id="scenarioResultCards"></div>
+    </section>
+  </div>
+
   <script src="gian-hang-hoi-cho.js"></script>
 </body>
+</html>
